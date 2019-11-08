@@ -4,17 +4,30 @@
 
 uint8_t seq; // remember number of boots in RTC Memory
 #define MyManufacturerId 0xffff  // test manufacturer ID
+#define S_PERIOD     1  // Silent period
 
 BLEScan* pBLEScan;
+hw_timer_t * timer = NULL;
+portMUX_TYPE timerMux = portMUX_INITIALIZER_UNLOCKED;
+void IRAM_ATTR on_timer(){
+       // esp_deep_sleep(SLEEP_MSEC(1000));              // S_PERIOD秒Deep Sleepする
+}
 
 void setup() {
     M5.begin();
 
     M5.Lcd.setTextSize(3);
 
-    BLEDevice::init("");
+    BLEDevice::init("");  
+
     pBLEScan = BLEDevice::getScan();
     pBLEScan->setActiveScan(false);
+
+    // timer = timerBegin(0,80,true);
+    // timerAttachInterrupt(timer,&on_timer,true);
+    // timerAlarmWrite(timer,1000000, true);
+    // timerAlarmEnable(timer);
+    
 }
 
 void loop() {
@@ -41,7 +54,10 @@ void loop() {
                 M5.Lcd.setCursor(20, 100); M5.Lcd.printf("humid:%4.1f%%\r\n", humid);
                 M5.Lcd.setCursor(20, 140); M5.Lcd.printf("press:%4.0fhPa\r\n", press);
                 M5.Lcd.setCursor(20, 180); M5.Lcd.printf("vbat: %4.2fV\r\n", vbat);
+                delay(1000);
             }
         }
     }
+    esp_deep_sleep(SLEEP_MSEC(1000)); 
+
 }
