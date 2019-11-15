@@ -40,9 +40,7 @@ class MyAdvertisedDeviceCallbacks : public BLEAdvertisedDeviceCallbacks {
   }
 };
 
-void setup() {
-  M5.begin();
-
+void setup_ble(){
   M5.Lcd.setTextSize(3);
 
   BLEDevice::init("");
@@ -50,14 +48,8 @@ void setup() {
   p_ble_scan = BLEDevice::getScan();
   p_ble_scan->setAdvertisedDeviceCallbacks(new MyAdvertisedDeviceCallbacks());
   p_ble_scan->setActiveScan(false);
-
-  // timer = timerBegin(0,80,true);
-  // timerAttachInterrupt(timer,&on_timer,true);
-  // timerAlarmWrite(timer,100000, true);
-  // timerAlarmEnable(timer);
 }
-
-void loop() {
+void task_ble(){
   BLEScanResults foundDevices = p_ble_scan->start(1);  // スキャンする
   int count = foundDevices.getCount();
   for (int i = 0; i < count; i++) {
@@ -85,5 +77,14 @@ void loop() {
     write_sd_card(time);
     // delay(1000);
   }
+}
+void setup() {
+  setup_ble();
+  M5.begin();
+}
+
+
+void loop() {
+  task_ble();
   // esp_deep_sleep(SLEEP_MSEC(1000));
 }
